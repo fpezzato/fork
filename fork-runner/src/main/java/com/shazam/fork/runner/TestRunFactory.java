@@ -34,7 +34,11 @@ public class TestRunFactory {
         this.testRunListenersFactory = testRunListenersFactory;
     }
 
-    public TestRun createTestRun(TestClass testClass, Device device, Pool pool, ProgressReporter progressReporter) {
+    public TestRun createTestRun(TestClass testClass,
+                                 Device device,
+                                 Pool pool,
+                                 ProgressReporter progressReporter,
+                                 FailureAccumulator failureAccumulator) {
         InstrumentationInfo instrumentationInfo = configuration.getInstrumentationInfo();
 
         TestRunParameters testRunParameters = testRunParameters()
@@ -50,7 +54,8 @@ public class TestRunFactory {
                 testClass,
                 device,
                 pool,
-                progressReporter);
+                progressReporter,
+                failureAccumulator);
 
         return new TestRun(
                 pool.getName(),

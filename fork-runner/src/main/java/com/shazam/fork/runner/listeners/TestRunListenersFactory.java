@@ -13,7 +13,10 @@ package com.shazam.fork.runner.listeners;
 import com.android.ddmlib.testrunner.ITestRunListener;
 import com.google.gson.Gson;
 import com.shazam.fork.Configuration;
-import com.shazam.fork.model.*;
+import com.shazam.fork.model.Device;
+import com.shazam.fork.model.Pool;
+import com.shazam.fork.model.TestClass;
+import com.shazam.fork.runner.FailureAccumulator;
 import com.shazam.fork.runner.ProgressReporter;
 import com.shazam.fork.system.io.FileManager;
 
@@ -41,7 +44,9 @@ public class TestRunListenersFactory {
     public List<ITestRunListener> createTestListeners(TestClass testClass,
                                                       Device device,
                                                       Pool pool,
-                                                      ProgressReporter progressReporter) {
+                                                      ProgressReporter progressReporter,
+                                                      FailureAccumulator failureAccumulator
+                                                      ) {
         return asList(
                 new ProgressTestRunListener(pool, progressReporter),
                 getForkXmlTestRunListener(fileManager, configuration.getOutput(), pool, device, testClass),
@@ -49,7 +54,9 @@ public class TestRunListenersFactory {
                         device.getModelName(), progressReporter),
                 new LogCatTestRunListener(gson, fileManager, pool, device),
                 new SlowWarningTestRunListener(),
-                getScreenTraceTestRunListener(fileManager, pool, device));
+                getScreenTraceTestRunListener(fileManager, pool, device),
+                new RetryListener(failureAccumulator, device)
+                );
     }
 
     public static ForkXmlTestRunListener getForkXmlTestRunListener(FileManager fileManager,

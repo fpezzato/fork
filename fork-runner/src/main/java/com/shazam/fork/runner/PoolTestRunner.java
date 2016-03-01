@@ -40,13 +40,14 @@ public class PoolTestRunner implements Runnable {
     private final CountDownLatch poolCountDownLatch;
     private final DeviceTestRunnerFactory deviceTestRunnerFactory;
     private final ProgressReporter progressReporter;
+    private final FailureAccumulator  failureAccumulator;
 
     public PoolTestRunner(Configuration configuration,
                           FileManager fileManager,
                           DeviceTestRunnerFactory deviceTestRunnerFactory, Pool pool,
                           Queue<TestClass> testClasses,
                           CountDownLatch poolCountDownLatch,
-                          ProgressReporter progressReporter) {
+                          ProgressReporter progressReporter, FailureAccumulator  failureAccumulator) {
         this.configuration = configuration;
         this.fileManager = fileManager;
         this.pool = pool;
@@ -54,6 +55,7 @@ public class PoolTestRunner implements Runnable {
         this.poolCountDownLatch = poolCountDownLatch;
         this.deviceTestRunnerFactory = deviceTestRunnerFactory;
         this.progressReporter = progressReporter;
+        this.failureAccumulator = failureAccumulator;
     }
 
     public void run() {
@@ -66,7 +68,7 @@ public class PoolTestRunner implements Runnable {
             logger.info("Pool {} started", poolName);
             for (Device device : pool.getDevices()) {
                 Runnable deviceTestRunner = deviceTestRunnerFactory.createDeviceTestRunner(pool, testClasses,
-                        deviceCountDownLatch, device, progressReporter);
+                        deviceCountDownLatch, device, progressReporter, failureAccumulator);
                 concurrentDeviceExecutor.execute(deviceTestRunner);
             }
             deviceCountDownLatch.await();
@@ -90,7 +92,7 @@ public class PoolTestRunner implements Runnable {
      * In particular, not triggering the console listener will probably make the flaky report better.
      */
     private void failAnyDroppedClasses(Pool pool, Queue<TestClass> testClassQueue) {
-        HashMap<String, String> emptyHash = new HashMap<>();
+        HashMap<String, String> emptyHash = new HashMap<String, String>();
         TestClass nextTest;
         while ((nextTest = testClassQueue.poll()) != null) {
             String className = nextTest.getName();
