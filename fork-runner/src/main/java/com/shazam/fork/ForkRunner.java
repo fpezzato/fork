@@ -13,7 +13,7 @@
 package com.shazam.fork;
 
 import com.shazam.fork.model.Pool;
-import com.shazam.fork.model.TestClass;
+import com.shazam.fork.model.TestCaseEvent;
 import com.shazam.fork.pooling.NoDevicesForPoolException;
 import com.shazam.fork.pooling.PoolLoader;
 import com.shazam.fork.runner.*;
@@ -60,12 +60,12 @@ public class ForkRunner {
             CountDownLatch poolCountDownLatch = new CountDownLatch(numberOfPools);
             poolExecutor = namedExecutor(numberOfPools, "PoolExecutor-%d");
 
-            List<TestClass> testClasses = testClassLoader.loadTestClasses();
-            summaryGeneratorHook.registerHook(pools, testClasses);
+            List<TestCaseEvent> testCases = testClassLoader.loadTestClasses();
+            summaryGeneratorHook.registerHook(pools, testCases);
 
             progressReporter.start();
             for (Pool pool : pools) {
-                PoolTestRunner poolTestRunner = poolTestRunnerFactory.createPoolTestRunner(pool, testClasses,
+                PoolTestRunner poolTestRunner = poolTestRunnerFactory.createPoolTestRunner(pool, testCases,
                         poolCountDownLatch, progressReporter);
                 poolExecutor.execute(poolTestRunner);
             }

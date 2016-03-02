@@ -38,13 +38,13 @@ public class TestRunListenersFactory {
         this.gson = gson;
     }
 
-    public List<ITestRunListener> createTestListeners(TestClass testClass,
+    public List<ITestRunListener> createTestListeners(TestCaseEvent testCase,
                                                       Device device,
                                                       Pool pool,
                                                       ProgressReporter progressReporter) {
         return asList(
                 new ProgressTestRunListener(pool, progressReporter),
-                getForkXmlTestRunListener(fileManager, configuration.getOutput(), pool, device, testClass),
+                getForkXmlTestRunListener(fileManager, configuration.getOutput(), pool, device, testCase),
                 new ConsoleLoggingTestRunListener(configuration.getTestPackage(), device.getSerial(),
                         device.getModelName(), progressReporter),
                 new LogCatTestRunListener(gson, fileManager, pool, device),
@@ -56,8 +56,8 @@ public class TestRunListenersFactory {
                                                                    File output,
                                                                    Pool pool,
                                                                    Device device,
-                                                                   TestClass testClass) {
-        ForkXmlTestRunListener xmlTestRunListener = new ForkXmlTestRunListener(fileManager, pool, device, testClass);
+                                                                   TestCaseEvent testCase) {
+        ForkXmlTestRunListener xmlTestRunListener = new ForkXmlTestRunListener(fileManager, pool, device, testCase);
         xmlTestRunListener.setReportDir(output);
         return xmlTestRunListener;
     }
