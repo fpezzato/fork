@@ -19,6 +19,7 @@ import com.google.common.base.Predicate;
 import com.shazam.fork.injector.ConfigurationInjector;
 import com.shazam.fork.model.Device;
 import com.shazam.fork.model.Pool;
+import com.shazam.fork.model.TestCaseEvent;
 import com.shazam.fork.model.TestClass;
 import com.shazam.fork.model.TestMethod;
 import com.shazam.fork.pooling.NoDevicesForPoolException;
@@ -95,13 +96,13 @@ public class ForkRunner {
             CountDownLatch poolCountDownLatch = new CountDownLatch(numberOfPools);
             poolExecutor = namedExecutor(numberOfPools, "PoolExecutor-%d");
 
-            List<TestClass> testClasses = testClassLoader.loadTestClasses();
-            summaryGeneratorHook.registerHook(pools, testClasses);
+            List<TestCaseEvent> testCases = testClassLoader.loadTestClasses();
+            summaryGeneratorHook.registerHook(pools, testCases);
 
             progressReporter.start();
             for (Pool pool : pools) {
-                PoolTestRunner poolTestRunner = poolTestRunnerFactory.createPoolTestRunner(pool, testClasses,
-                        poolCountDownLatch, progressReporter, failureAccumulator);
+                PoolTestRunner poolTestRunner = poolTestRunnerFactory.createPoolTestRunner(pool, testCases,
+                        poolCountDownLatch, progressReporter);
                 poolExecutor.execute(poolTestRunner);
             }
             poolCountDownLatch.await();

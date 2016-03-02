@@ -34,16 +34,12 @@ public class TestRunFactory {
         this.testRunListenersFactory = testRunListenersFactory;
     }
 
-    public TestRun createTestRun(TestClass testClass,
-                                 Device device,
-                                 Pool pool,
-                                 ProgressReporter progressReporter,
-                                 FailureAccumulator failureAccumulator) {
+    public TestRun createTestRun(TestCaseEvent testCase, Device device, Pool pool, ProgressReporter progressReporter) {
         InstrumentationInfo instrumentationInfo = configuration.getInstrumentationInfo();
 
         TestRunParameters testRunParameters = testRunParameters()
                 .withDeviceInterface(device.getDeviceInterface())
-                .withTest(testClass)
+                .withTest(testCase)
                 .withTestPackage(instrumentationInfo.getInstrumentationPackage())
                 .withTestRunner(instrumentationInfo.getTestRunnerClass())
                 .withTestSize(runtimeConfiguration.getTestSize())
@@ -51,11 +47,10 @@ public class TestRunFactory {
                 .build();
 
         List<ITestRunListener> testRunListeners = testRunListenersFactory.createTestListeners(
-                testClass,
+                testCase,
                 device,
                 pool,
-                progressReporter,
-                failureAccumulator);
+                progressReporter);
 
         return new TestRun(
                 pool.getName(),

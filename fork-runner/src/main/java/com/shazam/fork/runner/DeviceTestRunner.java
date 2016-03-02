@@ -31,7 +31,7 @@ public class DeviceTestRunner implements Runnable {
     private final Installer installer;
     private final Pool pool;
     private final Device device;
-    private final Queue<TestClass> queueOfTestsInPool;
+    private final Queue<TestCaseEvent> queueOfTestsInPool;
     private final CountDownLatch deviceCountDownLatch;
     private final ProgressReporter progressReporter;
     private final TestRunFactory testRunFactory;
@@ -40,7 +40,7 @@ public class DeviceTestRunner implements Runnable {
     public DeviceTestRunner(Installer installer,
                             Pool pool,
                             Device device,
-                            Queue<TestClass> queueOfTestsInPool,
+                            Queue<TestCaseEvent> queueOfTestsInPool,
                             CountDownLatch deviceCountDownLatch,
                             ProgressReporter progressReporter,
                             TestRunFactory testRunFactory, FailureAccumulator  failureAccumulator) {
@@ -63,9 +63,9 @@ public class DeviceTestRunner implements Runnable {
             removeRemoteDirectory(deviceInterface);
             createRemoteDirectory(deviceInterface);
 
-            TestClass testClass;
-            while ((testClass = queueOfTestsInPool.poll()) != null) {
-                TestRun testRun = testRunFactory.createTestRun(testClass, device, pool, progressReporter, failureAccumulator);
+            TestCaseEvent testCaseEvent;
+            while ((testCaseEvent = queueOfTestsInPool.poll()) != null) {
+                TestRun testRun = testRunFactory.createTestRun(testCaseEvent, device, pool, progressReporter);
                 testRun.execute();
             }
 		} finally {
