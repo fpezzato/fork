@@ -50,6 +50,7 @@ public class PoolTestRunnerFactory {
                 progressReporter);
     }
 
+    //TODO cleanup.
   /*  private int countTests(List<TestClass> testClasses) {
         int sum = 0;
         for (TestClass testClass : testClasses) {
