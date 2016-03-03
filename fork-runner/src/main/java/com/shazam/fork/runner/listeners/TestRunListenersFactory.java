@@ -47,7 +47,7 @@ public class TestRunListenersFactory {
                                                       TestCaseEvent currentTestCaseEvent) {
         return asList(
                 new ProgressTestRunListener(pool, progressReporter),
-                getForkXmlTestRunListener(fileManager, configuration.getOutput(), pool, device, testCase),
+                getForkXmlTestRunListener(fileManager, configuration.getOutput(), pool, device, testCase, progressReporter),
                 new ConsoleLoggingTestRunListener(configuration.getTestPackage(), device.getSerial(),
                         device.getModelName(), progressReporter),
                 new LogCatTestRunListener(gson, fileManager, pool, device),
@@ -60,8 +60,9 @@ public class TestRunListenersFactory {
                                                                    File output,
                                                                    Pool pool,
                                                                    Device device,
-                                                                   TestCaseEvent testCase) {
-        ForkXmlTestRunListener xmlTestRunListener = new ForkXmlTestRunListener(fileManager, pool, device, testCase);
+                                                                   TestCaseEvent testCase,
+                                                                   ProgressReporter progressReporter) {
+        ForkXmlTestRunListener xmlTestRunListener = new ForkXmlTestRunListener(fileManager, pool, device, testCase, progressReporter);
         xmlTestRunListener.setReportDir(output);
         return xmlTestRunListener;
     }
