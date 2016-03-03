@@ -13,7 +13,9 @@
 package com.shazam.fork.runner;
 
 import com.android.ddmlib.IDevice;
-import com.shazam.fork.model.*;
+import com.shazam.fork.model.Device;
+import com.shazam.fork.model.Pool;
+import com.shazam.fork.model.TestCaseEvent;
 import com.shazam.fork.system.adb.Installer;
 
 import org.slf4j.Logger;
@@ -44,16 +46,16 @@ public class DeviceTestRunner implements Runnable {
                             ProgressReporter progressReporter,
                             TestRunFactory testRunFactory) {
         this.installer = installer;
-		this.pool = pool;
-		this.device = device;
+        this.pool = pool;
+        this.device = device;
         this.queueOfTestsInPool = queueOfTestsInPool;
         this.deviceCountDownLatch = deviceCountDownLatch;
         this.progressReporter = progressReporter;
         this.testRunFactory = testRunFactory;
     }
 
-	@Override
-	public void run() {
+    @Override
+    public void run() {
         IDevice deviceInterface = device.getDeviceInterface();
         try {
             installer.prepareInstallation(deviceInterface);
@@ -63,12 +65,17 @@ public class DeviceTestRunner implements Runnable {
 
             TestCaseEvent testCaseEvent;
             while ((testCaseEvent = queueOfTestsInPool.poll()) != null) {
-                TestRun testRun = testRunFactory.createTestRun(testCaseEvent, device, pool, progressReporter);
+                TestRun testRun = testRunFactory.createTestRun(testCaseEvent,
+                        device,
+                        pool,
+                        progressReporter,
+                        queueOfTestsInPool,
+                        testCaseEvent);
                 testRun.execute();
             }
-		} finally {
+        } finally {
             logger.info("Device {} from pool {} finished", device.getSerial(), pool.getName());
-			deviceCountDownLatch.countDown();
-		}
-	}
+            deviceCountDownLatch.countDown();
+        }
+    }
 }
